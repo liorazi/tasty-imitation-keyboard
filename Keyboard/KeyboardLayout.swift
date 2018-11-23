@@ -176,7 +176,10 @@ class GlobalColors: NSObject {
     class var darkModeTextColor: UIColor { get { return UIColor.white }}
     class var lightModeBorderColor: UIColor { get { return UIColor(hue: (214/360.0), saturation: 0.04, brightness: 0.65, alpha: 1.0) }}
     class var darkModeBorderColor: UIColor { get { return UIColor.clear }}
-    
+
+	//
+	class var blueModeReturnKey: UIColor { get { return UIColor(red: CGFloat(0)/CGFloat(255), green: CGFloat(122)/CGFloat(255), blue: CGFloat(255)/CGFloat(255), alpha: 1.0) }}
+	//
     class func regularKey(_ darkMode: Bool, solidColorMode: Bool) -> UIColor {
         if darkMode {
             if solidColorMode {
@@ -223,7 +226,65 @@ class GlobalColors: NSObject {
             }
         }
     }
+
+	//
+
+	class func returnKey(darkMode: Bool, solidColorMode: Bool, returnKeyType: UIReturnKeyType, textColorMode: Bool) -> UIColor {
+		if (!textColorMode) {
+			switch returnKeyType {
+			case .go,
+				 .done,
+				 .emergencyCall,
+				 .google,
+				 .join,
+				 .route,
+				 .search,
+				 .send,
+				 .yahoo:
+				return self.blueModeReturnKey
+
+			case
+			.continue,
+			.default,
+			.next:
+				return self.specialKey(darkMode, solidColorMode: solidColorMode)
+
+			}
+		}
+			//key.textColor = (darkMode ? self.globalColors.darkModeTextColor : self.globalColors.lightModeTextColor)
+
+		else {
+			switch returnKeyType {
+			case .go,
+				 .done,
+				 .emergencyCall,
+				 .google,
+				 .join,
+				 .route,
+				 .search,
+				 .send,
+				 .yahoo:
+				return self.darkModeTextColor
+
+			case
+			.continue,
+			.default,
+			.next:
+				return darkMode ? self.darkModeTextColor : self.lightModeTextColor
+
+			}
+
+		}
+	}
+
 }
+
+//
+
+
+
+
+
 
 //"darkShadowColor": UIColor(hue: (220/360.0), saturation: 0.04, brightness: 0.56, alpha: 1),
 //"blueColor": UIColor(hue: (211/360.0), saturation: 1.0, brightness: 1.0, alpha: 1),
@@ -266,8 +327,63 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
     var darkMode: Bool
     var solidColorMode: Bool
     var initialized: Bool
+
+	//
+	var returnKeyEnabled: Bool
+
+	var returnKeyType: UIReturnKeyType {
+		willSet {
+
+		}
+		didSet {
+			/*
+			case Default
+			case Go
+			case Google
+			case Join
+			case Next
+			case Route
+			case Search
+			case Send
+			case Yahoo
+			case Done
+			case EmergencyCall
+			@available(iOS 9.0, *)
+			case Continue
+
+			*/
+			//			print (returnKeyType.rawValue)
+			//			switch returnKeyType {
+			//			case .Go:
+			//				print ("Go")
+			//			case .Google:
+			//				print ("Google")
+			//			case .Search:
+			//				print ("Search")
+			//			case .Join:
+			//				print ("Join")
+			//			case .Next:
+			//				print ("Next")
+			//			case .Route:
+			//				print ("Route")
+			//			case .Send:
+			//				print ("Send")
+			//			case .Yahoo:
+			//				print ("Yahoo")
+			//			case .Done:
+			//				print ("Done")
+			//			case .EmergencyCall:
+			//				print ("EmergencyCall")
+			//			case .Continue:
+			//				print ("Continue")
+			//			default:
+			//				print ("Default")
+			//			}
+		}
+	}
+	//
     
-    required init(model: Keyboard, superview: UIView, layoutConstants: LayoutConstants.Type, globalColors: GlobalColors.Type, darkMode: Bool, solidColorMode: Bool) {
+    required init(model: Keyboard, superview: UIView, layoutConstants: LayoutConstants.Type, globalColors: GlobalColors.Type, darkMode: Bool, solidColorMode: Bool, returnKeyEnabled: Bool,  returnType: UIReturnKeyType) {
         self.layoutConstants = layoutConstants
         self.globalColors = globalColors
         
@@ -277,6 +393,9 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
         
         self.darkMode = darkMode
         self.solidColorMode = solidColorMode
+
+		self.returnKeyEnabled = returnKeyEnabled
+		self.returnKeyType = returnType
     }
     
     // TODO: remove this method
@@ -394,6 +513,18 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
         
         CATransaction.commit()
     }
+
+	//	func updateReturnKeyAppearance() {
+	//		CATransaction.begin()
+	//		CATransaction.setDisableActions(true)
+	//
+	////		for (key, view) in self.modelToView {
+	////			self.setAppearanceForKey(view, model: key, darkMode: self.darkMode, solidColorMode: self.solidColorMode)
+	////		}
+	//		print ("updating return key appearance")
+	//
+	//		CATransaction.commit()
+	//	}
     
     // on fullReset, we update the keys with shapes, images, etc. as if from scratch; otherwise, just update the text
     // WARNING: if key cache is disabled, DO NOT CALL WITH fullReset MORE THAN ONCE
@@ -437,8 +568,15 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
             case
             Key.KeyType.modeChange:
                 key.labelInset = 3
+			//
+			case
+			Key.KeyType.character:
+				key.heightInset = -2
+				key.labelInset = 0
+			//
             default:
                 key.labelInset = 0
+				key.heightInset = 0
             }
             
             // shapes
@@ -458,6 +596,18 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
                     let globeShape = self.getShape(GlobeShape.self)
                     key.shape = globeShape
                 }
+			//
+			case Key.KeyType.return:
+				if self.returnKeyType == UIReturnKeyType.default {
+					if key.shape == nil {
+						let returnShape = self.getShape(ReturnShape.self)
+						key.shape = returnShape
+					}
+				}
+				else {
+					key.shape = nil
+				}
+			//
             default:
                 break
             }
@@ -473,6 +623,21 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
                 }
             }
         }
+
+		//
+
+		if model.type == Key.KeyType.return {
+			if self.returnKeyType == UIReturnKeyType.default {
+				if key.shape == nil {
+					let returnShape = self.getShape(ReturnShape.self)
+					key.shape = returnShape
+				}
+			}
+			else {
+				key.shape = nil
+			}
+		}
+		//
         
         if model.type == Key.KeyType.shift {
             if key.shape == nil {
@@ -553,7 +718,6 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
             key.textColor = (darkMode ? self.globalColors.darkModeTextColor : self.globalColors.lightModeTextColor)
             key.downTextColor = nil
         case
-        Key.KeyType.return,
         Key.KeyType.keyboardChange,
         Key.KeyType.settings:
             key.color = self.globalColors.specialKey(darkMode, solidColorMode: solidColorMode)
@@ -561,6 +725,26 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
             key.downColor = self.globalColors.regularKey(darkMode, solidColorMode: solidColorMode)
             key.textColor = (darkMode ? self.globalColors.darkModeTextColor : self.globalColors.lightModeTextColor)
             key.downTextColor = nil
+		case
+		Key.KeyType.return:
+			key.isEnabled = returnKeyEnabled
+
+			if (key.isEnabled) {
+				//enabled colors
+				//key.color = self.globalColors.specialKey(darkMode, solidColorMode: solidColorMode)
+				//key.textColor = (darkMode ? self.globalColors.darkModeTextColor : self.globalColors.lightModeTextColor)
+				key.downColor = self.globalColors.regularKey(darkMode, solidColorMode: solidColorMode)
+				key.textColor = self.globalColors.returnKey(darkMode: darkMode, solidColorMode: solidColorMode, returnKeyType: self.returnKeyType, textColorMode: true)
+				key.downTextColor = (darkMode ? nil : self.globalColors.lightModeTextColor)
+				key.color = self.globalColors.returnKey(darkMode: darkMode, solidColorMode: solidColorMode, returnKeyType: self.returnKeyType, textColorMode: false)
+			}
+			else {
+				//disabled colors
+				key.downColor = self.globalColors.regularKey(darkMode, solidColorMode: solidColorMode)
+				key.textColor = UIColor.gray
+				key.downTextColor = (darkMode ? nil : self.globalColors.lightModeTextColor)
+				key.color = self.globalColors.specialKey(darkMode, solidColorMode: solidColorMode)
+			}
         default:
             break
         }
@@ -843,7 +1027,49 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
     func doubleSidedRowHeuristic(_ row: [Key]) -> Bool {
         return (row.count >= 3 && !row[0].isCharacter && row[1].isCharacter)
     }
-    
+
+	func layoutBackspaceAndCharacterRow(row: [Key], keyWidth: CGFloat, gapWidth: CGFloat, frame: CGRect) -> [CGRect] {
+		var frames = [CGRect]()
+
+		let keySpace = CGFloat(row.count) * keyWidth + CGFloat(row.count - 1) * gapWidth
+		var actualGapWidth = gapWidth
+		var sideSpace = (frame.width - keySpace) / CGFloat(2)
+
+		// TODO: port this to the other layout functions
+		// avoiding rounding errors
+		if sideSpace < 0 {
+			sideSpace = 0
+			actualGapWidth = (frame.width - (CGFloat(row.count) * keyWidth)) / CGFloat(row.count - 1)
+		}
+
+		var currentOrigin = frame.origin.x + sideSpace
+
+		for (_, _) in row.enumerated() {
+			let roundedOrigin = rounded(currentOrigin)
+
+			// avoiding rounding errors
+			if roundedOrigin + keyWidth > frame.origin.x + frame.width {
+				frames.append(CGRect.init(x: frame.origin.x + frame.width - keyWidth,
+										  y: frame.origin.y,
+										  width: keyWidth,
+										  height: frame.height))
+			}
+			else {
+				frames.append(CGRect.init(x: rounded(currentOrigin),
+										  y: frame.origin.y,
+										  width: keyWidth,
+										  height: frame.height))
+			}
+
+			currentOrigin += (keyWidth + actualGapWidth)
+		}
+		let oldBackspace = frames[frames.count-1]
+		let newBackspace = CGRect.init(x: oldBackspace.origin.x + 8, y: oldBackspace.origin.y, width: oldBackspace.width + 10, height: oldBackspace.height)
+		frames[frames.count-1] = newBackspace
+
+		return frames
+	}
+
     func layoutCharacterRow(_ row: [Key], keyWidth: CGFloat, gapWidth: CGFloat, frame: CGRect) -> [CGRect] {
         var frames = [CGRect]()
         
@@ -966,9 +1192,10 @@ class KeyboardLayout: NSObject, KeyboardKeyProtocol {
         let micButtonWidth = (isLandscape ? leftButtonWidth : leftButtonWidth * micButtonRatio)
         
         // special case for mic button
-        if hasButtonInMicButtonPosition {
-            leftSideAreaWidth = leftSideAreaWidth + gapWidth + micButtonWidth
-        }
+		//
+        //if hasButtonInMicButtonPosition {
+        //    leftSideAreaWidth = leftSideAreaWidth + gapWidth + micButtonWidth
+        //}
         
         var spaceWidth = frame.width - leftSideAreaWidth - rightSideAreaWidth - gapWidth * CGFloat(2)
         spaceWidth = rounded(spaceWidth)

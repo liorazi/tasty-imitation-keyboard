@@ -24,6 +24,7 @@ enum VibrancyType {
     case darkRegular
 }
 
+@objcMembers
 class KeyboardKey: UIControl {
     
     weak var delegate: KeyboardKeyProtocol?
@@ -60,6 +61,16 @@ class KeyboardKey: UIControl {
             }
         }
     }
+
+	////
+	var heightInset: CGFloat = 0 {
+		didSet {
+			if oldValue != labelInset {
+				self.label.frame = CGRect.init(x: self.labelInset, y: self.labelInset + self.heightInset, width: self.bounds.width - self.labelInset * 2, height: self.bounds.height - self.labelInset * 2)
+			}
+		}
+	}
+	///
     
     var shouldRasterize: Bool = false {
         didSet {
@@ -170,7 +181,14 @@ class KeyboardKey: UIControl {
             
             self.label.textAlignment = NSTextAlignment.center
             self.label.baselineAdjustment = UIBaselineAdjustment.alignCenters
-            self.label.font = self.label.font.withSize(22)
+//            self.label.font = self.label.font.withSize(22)
+			if UIDevice.current.userInterfaceIdiom != UIUserInterfaceIdiom.pad {
+				self.label.font = self.label.font.withSize(24)
+			}
+			else {
+				self.label.font = self.label.font.withSize(30)
+			}
+
             self.label.adjustsFontSizeToFitWidth = true
             self.label.minimumScaleFactor = CGFloat(0.1)
             self.label.isUserInteractionEnabled = false

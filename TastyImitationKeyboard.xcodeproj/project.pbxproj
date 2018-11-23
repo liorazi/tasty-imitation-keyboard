@@ -393,10 +393,12 @@
 				TargetAttributes = {
 					4E807D9219461D9000D875D1 = {
 						CreatedOnToolsVersion = 6.0;
+						DevelopmentTeam = C762B3BMCV;
 						LastSwiftMigration = 0810;
 					};
 					4E807DB819461DC700D875D1 = {
 						CreatedOnToolsVersion = 6.0;
+						DevelopmentTeam = C762B3BMCV;
 						LastSwiftMigration = 0810;
 					};
 					4E8EF38019F95D74009CBF5D = {
@@ -637,6 +639,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = C762B3BMCV;
 				INFOPLIST_FILE = HostingApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Archagon.$(PRODUCT_NAME:rfc1034identifier)";
@@ -651,6 +654,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = C762B3BMCV;
 				INFOPLIST_FILE = HostingApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Archagon.$(PRODUCT_NAME:rfc1034identifier)";
@@ -663,6 +667,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				DEVELOPMENT_TEAM = C762B3BMCV;
 				INFOPLIST_FILE = Keyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Archagon.HostingApp.$(PRODUCT_NAME:rfc1034identifier)";
@@ -676,6 +681,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				DEVELOPMENT_TEAM = C762B3BMCV;
 				INFOPLIST_FILE = Keyboard/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "Archagon.HostingApp.$(PRODUCT_NAME:rfc1034identifier)";
